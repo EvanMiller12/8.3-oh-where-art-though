@@ -17,12 +17,16 @@ var AppRouter = Backbone.Router.extend({
     setupAjax('tiygvl', 'slumber', token)
   },
   index: function(){
+    // ReactDOM.unmountComponentAtNode(document.getElementById('app'));
+
     ReactDOM.render(
       React.createElement(AppContainer, {router: this}),
       document.getElementById('app')
     );
   },
   messages: function(){
+    // ReactDOM.unmountComponentAtNode(document.getElementById('app'));
+
     ReactDOM.render(
       React.createElement(MessageContainer, {router: this}),
       document.getElementById('app')

@@ -2,7 +2,7 @@ var $ = require('jquery');
 var Backbone = require('backbone');
 
 var User = Backbone.Model.extend({
-
+  idAttribute: 'objectId',
   urlRoot: 'https://tiny-parse-server.herokuapp.com/users',
   parse: function(data){
     console.log('parse', data);
@@ -29,7 +29,7 @@ var User = Backbone.Model.extend({
   },
 });
 
-
+//
 //   login: function(cridentials, callback){
 //     var url = '.../login?' + $.param(cridentials);
 //     $.get(url).then(data => {

@@ -13,7 +13,7 @@ class AppContainer extends React.Component {
       user: new User()
     }
   }
-  createAccount() {
+  createAccount(username, password) {
     this.state.user.set({username: username, password: password});
     this.state.user.createAccount()
   }
@@ -29,7 +29,7 @@ class AppContainer extends React.Component {
           <div className="col-md-6">
             <h1>Please Login</h1>
 
-            <LoginForm login={this.login.bind(this)}/>
+            <LoginForm login={this.login.bind(this)} />
 
           </div>
 
@@ -37,14 +37,7 @@ class AppContainer extends React.Component {
           <div className="col-md-6">
             <h1>No Account? Please Sign Up!</h1>
 
-            <SignupForm createAccount={this.createAccount.bind(this)}/>
-
-          </div>
-
-          <div className="col-md-12">
-            <h1>Oh User!</h1>
-
-            <MessageForm />
+            <SignupForm createAccount={this.createAccount.bind(this)} />
 
           </div>
         </div>
@@ -132,7 +125,7 @@ class SignupForm extends React.Component {
           <input onChange={this.updatePassword.bind(this)} value={this.state.password} id="signup-password" className="form-control" type="text" name="password" placeholder="Password" />
         </div>
 
-        <input className="btn btn-primary" type="submit" name="" value="Sign Up!" />
+        <input className="btn btn-primary" type="submit" value="Sign Up!" />
       </form>
     )
   }
