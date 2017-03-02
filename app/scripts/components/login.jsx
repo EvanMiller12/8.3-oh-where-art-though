@@ -4,58 +4,23 @@ var React = require('react');
 var MessageForm = require('./messages.jsx').MessageForm;
 
 var User = require('../models/user.js').User;
-var MessageCollection = require('../models/message.js').MessageCollection;
-
-var apiUrl = 'https://tiny-parse-server.herokuapp.com'
 
 class AppContainer extends React.Component {
-  // constructor(props) {
-  //   super(props);
-  //
-  //   var userData = JSON.stringify(localStorage.getItem('user'));
-  //   var user = new User(userData)
-  //
-  //   this.state = {
-  //     user
-  //   }
-  // }
+  constructor(props) {
+    super(props);
 
-  handleSignup(event) {
-    event.preventDefault();
-    var user = {
-      username: $('#signup-email').val(),
-      password: $('#signup-password').val()
+    this.state = {
+      user: new User()
     }
-    $.post(apiUrl + '/users', user).then(function(data){
-
-    })
   }
-
-  handleLogin(event) {
-    event.preventDefault();
-
-    var self = this;
-
-    var user = {
-      username: $('#email-login').val(),
-      password: $('#password-login').val()
-    }
-
-    var url = apiUrl + '/login?username=' +
-    encodeURIComponent(user.username) + '&' +
-    'password=' + encodeURIComponent(user.password);
-
-    $.get(url).then(function(data){
-      localStorage.setItem('userToken', data.sessionToken);
-      self.props.router.navigate('#message', {trigger: true});
-    });
+  createAccount() {
+    this.state.user.set({username: username, password: password});
+    this.state.user.createAccount()
   }
-
-    handlePageChange(event){
-      event.preventDefault()
-      $('#app').empty()
-    }
-
+  login(username, password) {
+    this.state.user.set({username: username, password: password})
+    this.state.user.login(username, password)
+  }
   render() {
 
     return (
@@ -64,7 +29,7 @@ class AppContainer extends React.Component {
           <div className="col-md-6">
             <h1>Please Login</h1>
 
-            <LoginForm handlePageChange{this.handlePageChange.bind(this)} handleLogin={this.handleLogin.bind(this)}/>
+            <LoginForm login={this.login.bind(this)}/>
 
           </div>
 
@@ -72,7 +37,7 @@ class AppContainer extends React.Component {
           <div className="col-md-6">
             <h1>No Account? Please Sign Up!</h1>
 
-            <SignupForm handleSignup={this.handleSignup.bind(this)}/>
+            <SignupForm createAccount={this.createAccount.bind(this)}/>
 
           </div>
 
@@ -89,81 +54,85 @@ class AppContainer extends React.Component {
 }
 
 class LoginForm extends React.Component {
-  // handleLogin(event) {
-  //   event.preventDefault();
-  //   var username = this.state.username;
-  //   var password = this.state.password;
-  //   var user = ({username: username, password: password})
-  //
-  //   var url = apiUrl + '/login?username=' +
-  //   encodeURIComponent(username) + '&' +
-  //   'password=' + encodeURIComponent(password);
-  //
-  //   $.get(url).then(function(data){
-  //     var userData = JSON.stringify(data);
-  //     localStorage.setItem('user', userData);
-  //   });
-  // }
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      username: '',
+      password: ''
+    }
+  }
+  handleLogin(event) {
+    event.preventDefault();
+    var username = this.state.username
+    var password = this.state.password
+
+    this.props.login(username, password);
+    }
+  handleUsername(event) {
+    this.setState({username: event.target.value})
+  }
+
+  handlePassword(event) {
+    this.setState({password: event.target.value})
+  }
 
   render() {
 
     return (
-      <form id="login">
+      <form onSubmit={this.handleLogin.bind(this)} id="login">
         <div className="form-group">
-          <input className="form-control" name="email" id="email-login" type="email" placeholder="email" />
+          <input onChange={this.handleUsername.bind(this)} value={this.state.username} className="form-control" name="email" id="email-login" type="email" placeholder="email" />
         </div>
 
         <div className="form-group">
-          <input className="form-control" name="password" id="password-login" type="password" placeholder="Password Please" />
+          <input onChange={this.handlePassword.bind(this)} value={this.state.password} className="form-control" name="password" id="password-login" type="password" placeholder="Password Please" />
         </div>
 
-        <input onClick={this.props.handleLogin} className="btn btn-primary" type="submit" value="Login" />
+        <input className="btn btn-primary" type="submit" value="Login" />
       </form>
     )
   }
 }
 
 class SignupForm extends React.Component {
-  // constructor(props) {
-  //   super(props)
-  //   this.state = {
-  //     username: '',
-  //     password: ''
-  //   }
-  // }
-  // handleSignup(event) {
-  //   event.preventDefault();
-  //   var username = this.state.username;
-  //   var password = this.state.password;
-  //   var user = ({username: username, password: password})
-  //   console.log(user)
-  //   $.post(apiUrl + '/users', user).then(function(data){
-  //
-  //   })
-  // }
+  constructor(props) {
+    super(props)
+    this.state = {
+      username: '',
+      password: ''
+    }
+  }
+  handleSignup(event) {
+    event.preventDefault();
+    var username = this.state.username;
+    var password = this.state.password;
 
-  // updateUsername(event) {
-  //   // console.log(this);
-  //   this.setState({username: event.target.value})
-  // }
+    this.props.createAccount(username, password);
+  }
 
-  // updatePassword(event) {
-  //   this.setState({password: event.target.value})
-  // }
+  updateUsername(event) {
+    // console.log(this);
+    this.setState({username: event.target.value})
+  }
+
+  updatePassword(event) {
+    this.setState({password: event.target.value})
+  }
 
   render() {
 
     return (
-      <form id="signup">
+      <form onSubmit={this.handleSignup.bind(this)} id="signup">
         <div className="form-group">
-          <input id="signup-email" className="form-control" type="text" name="email" placeholder="Email Address" />
+          <input onChange={this.updateUsername.bind(this)} value={this.state.username} id="signup-email" className="form-control" type="text" name="email" placeholder="Email Address" />
         </div>
 
         <div className="form-group">
-          <input id="signup-password" className="form-control" type="text" name="password" placeholder="Password" />
+          <input onChange={this.updatePassword.bind(this)} value={this.state.password} id="signup-password" className="form-control" type="text" name="password" placeholder="Password" />
         </div>
 
-        <input onClick={this.props.handleSignup} className="btn btn-primary" type="submit" name="" value="Sign Up!" />
+        <input className="btn btn-primary" type="submit" name="" value="Sign Up!" />
       </form>
     )
   }

@@ -1,14 +1,17 @@
 var $ = require('jquery');
 
-function setupAjax(loggedInUser){
+function setupAjax(appId, apiKey, sessionId){
   $.ajaxSetup({
       beforeSend: function(xhr){
-        xhr.setRequestHeader("X-Parse-Application-Id", "tiygvl");
-        xhr.setRequestHeader("X-Parse-REST-API-Key", "slumber");
-        if(loggedInUser){
-          xhr.setRequestHeader("X-Parse-Session-Token", loggedInUser.sessionToken);
+        xhr.setRequestHeader("X-Parse-Application-Id", appId);
+        xhr.setRequestHeader("X-Parse-REST-API-Key", apiKey);
+        if(sessionId){
+          xhr.setRequestHeader("X-Parse-Session-Token", sessionId);
         }
       }
   });
 }
-setupAjax();
+
+module.exports = {
+  setupAjax
+}

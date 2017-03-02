@@ -3,14 +3,18 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 
 var AppContainer = require('./components/login.jsx').AppContainer;
+var MessageContainer = require('./components/messages.jsx').MessageContainer;
+
+var token = localStorage.getItem('token');
+var setupAjax = require('./utilities.js').setupAjax;
 
 var AppRouter = Backbone.Router.extend({
   routes: {
     '': 'index',
-    'message': 'message'
+    'messages': 'messages'
   },
   initialize: function(){
-    this.username = localStorage.getItem('username');
+    setupAjax('tiygvl', 'slumber', token)
   },
   index: function(){
     ReactDOM.render(
@@ -18,9 +22,9 @@ var AppRouter = Backbone.Router.extend({
       document.getElementById('app')
     );
   },
-  message: function(){
+  messages: function(){
     ReactDOM.render(
-      React.createElement(AppContainer, {router: this}),
+      React.createElement(MessageContainer, {router: this}),
       document.getElementById('app')
     );
   }
