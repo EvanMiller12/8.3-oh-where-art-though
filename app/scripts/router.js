@@ -5,30 +5,27 @@ var ReactDOM = require('react-dom');
 var AppContainer = require('./components/login.jsx').AppContainer;
 var MessageContainer = require('./components/messages.jsx').MessageContainer;
 
-var token = localStorage.getItem('token');
-var setupAjax = require('./utilities.js').setupAjax;
+var parse = require('./utilities.js');
 
 var AppRouter = Backbone.Router.extend({
   routes: {
     '': 'index',
-    'messages': 'messages'
+    'messages/': 'messages'
   },
   initialize: function(){
-    setupAjax('tiygvl', 'slumber', token)
+    parse.setup({
+      BASE_API_URL: 'https://hip-puppies.herokuapp.com'
+    });
   },
   index: function(){
-    // ReactDOM.unmountComponentAtNode(document.getElementById('app'));
-
     ReactDOM.render(
-      React.createElement(AppContainer, {router: this}),
+      React.createElement(AppContainer),
       document.getElementById('app')
     );
   },
   messages: function(){
-    // ReactDOM.unmountComponentAtNode(document.getElementById('app'));
-
     ReactDOM.render(
-      React.createElement(MessageContainer, {router: this}),
+      React.createElement(MessageContainer),
       document.getElementById('app')
     );
   }

@@ -1,17 +1,23 @@
 var $ = require('jquery');
 
-function setupAjax(appId, apiKey, sessionId){
-  $.ajaxSetup({
+var parse = {
+  BASE_API_URL: '',
+  setup: function(config){
+    if(config.BASE_API_URL){
+      this.BASE_API_URL = config.BASE_API_URL;
+    }
+
+    $.ajaxSetup({
       beforeSend: function(xhr){
-        xhr.setRequestHeader("X-Parse-Application-Id", appId);
-        xhr.setRequestHeader("X-Parse-REST-API-Key", apiKey);
-        if(sessionId){
+        xhr.setRequestHeader("X-Parse-Application-Id", "tiygvl");
+        xhr.setRequestHeader("X-Parse-REST-API-Key", "somevalue");
+
+        if(config.sessionId){
           xhr.setRequestHeader("X-Parse-Session-Token", sessionId);
         }
       }
-  });
+    });
+  }
 }
 
-module.exports = {
-  setupAjax
-}
+module.exports = parse;

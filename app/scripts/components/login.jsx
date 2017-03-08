@@ -1,25 +1,28 @@
 var $ = require('jquery');
 var React = require('react');
+var Backbone = require('backbone');
 
 var MessageForm = require('./messages.jsx').MessageForm;
-
 var User = require('../models/user.js').User;
 
 class AppContainer extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      user: new User()
-    }
+    this.login = this.login.bind(this);
   }
-  createAccount(username, password) {
-    this.state.user.set({username: username, password: password});
-    this.state.user.createAccount()
+  login(info){
+    User.login(info, function(user){
+      Backbone.history.navigate('messages/', {trigger: true});
+    });
   }
-  login(username, password) {
-    this.state.user.set({username: username, password: password})
-    this.state.user.login(username, password)
+
+  createAccount(info){
+    var user = new User(info);
+    user.save().then(function(data){
+      localStorage.setItem('user', JSON.stringify(data));
+    });
+
   }
   render() {
 
@@ -29,7 +32,7 @@ class AppContainer extends React.Component {
           <div className="col-md-6">
             <h1>Please Login</h1>
 
-            <LoginForm login={this.login.bind(this)} />
+            <LoginForm action={this.login} submitBtn="Login" />
 
           </div>
 
@@ -37,7 +40,7 @@ class AppContainer extends React.Component {
           <div className="col-md-6">
             <h1>No Account? Please Sign Up!</h1>
 
-            <SignupForm createAccount={this.createAccount.bind(this)} />
+            <SignupForm action={this.createAccount} submitBtn="Signup" />
 
           </div>
         </div>
@@ -50,85 +53,46 @@ class LoginForm extends React.Component {
   constructor(props) {
     super(props)
 
+    this.userEmail = this.userEmail.bind(this);
+    this.userPassword = this.userPassword.bind(this);
+    this.handleLogin = this.handleLogin.bind(this);
+
     this.state = {
       username: '',
       password: ''
-    }
+    };
   }
-  handleLogin(event) {
-    event.preventDefault();
-    var username = this.state.username
-    var password = this.state.password
-
-    this.props.login(username, password);
-    }
-  handleUsername(event) {
-    this.setState({username: event.target.value})
+  userEmail(e){
+    this.setState({username: e.target.value});
   }
-
-  handlePassword(event) {
-    this.setState({password: event.target.value})
+  userPassword(e){
+    this.setState({password: e.target.value});
+  }
+  handleLogin(e){
+    e.preventDefault();
+    this.props.action(this.state);
   }
 
   render() {
 
     return (
-      <form onSubmit={this.handleLogin.bind(this)} id="login">
+      <form onSubmit={this.handleLogin}>
         <div className="form-group">
-          <input onChange={this.handleUsername.bind(this)} value={this.state.username} className="form-control" name="email" id="email-login" type="email" placeholder="email" />
+          <input onChange={this.userEmail} value={this.state.username} className="form-control" name="email" id="email-login" type="email" placeholder="email" />
         </div>
 
         <div className="form-group">
-          <input onChange={this.handlePassword.bind(this)} value={this.state.password} className="form-control" name="password" id="password-login" type="password" placeholder="Password Please" />
+          <input onChange={this.userPassword} value={this.state.password} className="form-control" name="password" id="password-login" type="password" placeholder="Password Please" />
         </div>
 
-        <input className="btn btn-primary" type="submit" value="Login" />
+        <input className="btn btn-primary" type="submit" value={this.props.submitBtn} />
       </form>
     )
   }
 }
 
-class SignupForm extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      username: '',
-      password: ''
-    }
-  }
-  handleSignup(event) {
-    event.preventDefault();
-    var username = this.state.username;
-    var password = this.state.password;
+class SignupForm extends LoginForm {
 
-    this.props.createAccount(username, password);
-  }
-
-  updateUsername(event) {
-    // console.log(this);
-    this.setState({username: event.target.value})
-  }
-
-  updatePassword(event) {
-    this.setState({password: event.target.value})
-  }
-
-  render() {
-
-    return (
-      <form onSubmit={this.handleSignup.bind(this)} id="signup">
-        <div className="form-group">
-          <input onChange={this.updateUsername.bind(this)} value={this.state.username} id="signup-email" className="form-control" type="text" name="email" placeholder="Email Address" />
-        </div>
-
-        <div className="form-group">
-          <input onChange={this.updatePassword.bind(this)} value={this.state.password} id="signup-password" className="form-control" type="text" name="password" placeholder="Password" />
-        </div>
-
-        <input className="btn btn-primary" type="submit" value="Sign Up!" />
-      </form>
-    )
-  }
 }
 
 
