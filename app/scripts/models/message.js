@@ -12,6 +12,8 @@ var Message = Backbone.Model.extend({
 
 var MessageCollection = Backbone.Collection.extend({
   model: Message,
+  idAttribute: 'objectId',
+  
   url: function(){
     return parse.BASE_API_URL = '/classes/Message'
   },

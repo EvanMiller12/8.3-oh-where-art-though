@@ -1,5 +1,6 @@
 var React = require('react');
 
+var Message = require('../models/message.js').Message;
 var MessageCollection = require('../models/message.js').MessageCollection;
 var User = require('../models/user.js').User;
 
@@ -11,27 +12,25 @@ class MessageContainer extends React.Component {
     var messageCollection =  new MessageCollection()
 
     messageCollection.fetch().then(()=>{
-      this.setState({messageCollection: messageCollection});
+      this.setState({messageCollection});
     });
 
     this.postMessage = this.postMessage.bind(this);
 
     this.state = {
       messageCollection,
-      username: ''
     };
   }
   postMessage(data){
     var messageData = {
-      username: data.user,
-      message: data.message,
+      username: localStorage.getItem('username'),
+      message: data.message
     };
 
     this.state.messageCollection.create(messageData)
     this.setState({messageCollection: this.state.messageCollection});
   }
   render() {
-
     return(
       <div className="container">
         <div className="row">
@@ -52,33 +51,13 @@ class MessageContainer extends React.Component {
   }
 }
 
-class MessageList extends React.Component {
-  render(){
-    var messages = this.props.messageList;
-
-    var messageList = messages.map((data) => {
-      return (
-        <li key={data.get('objectId')}>
-          <span>{data.get('username')}</span>
-          <p>{data.get('message')}</p>
-        </li>
-      )
-    })
-
-    return (
-      <ul>
-        {messageList}
-      </ul>
-    )
-  }
-}
-
 class MessageForm extends React.Component {
   constructor(props){
     super(props)
+    var message = new Message();
 
-  this.handleSubmit = this.handleSubmit.bind(this)
-  this.handleMessage = this.handleMessage.bind(this)
+    this.handleSubmit = this.handleSubmit.bind(this)
+    this.handleMessage = this.handleMessage.bind(this)
 
     this.state = {
       message: ''
@@ -86,8 +65,6 @@ class MessageForm extends React.Component {
   }
   handleSubmit(event){
     event.preventDefault();
-
-    username: localStorage.getItem('user')
 
     this.props.postMessage(this.state);
     this.setState({message: ''})
@@ -109,6 +86,27 @@ class MessageForm extends React.Component {
     );
   }
 };
+
+class MessageList extends React.Component {
+  render(){
+    var messages = this.props.messageList;
+
+    var messageList = messages.map((data) => {
+      return (
+        <li key={data.get('objectId')}>
+          <span>{data.get('username')}</span>
+          <p>{data.get('message')}</p>
+        </li>
+      )
+    })
+
+    return (
+      <ul>
+        {messageList}
+      </ul>
+    )
+  }
+}
 
 module.exports = {
   MessageContainer
