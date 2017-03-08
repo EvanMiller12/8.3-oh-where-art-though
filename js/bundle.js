@@ -107,6 +107,7 @@ module.exports = {
 "use strict";
 var React = require('react');
 
+var Message = require('../models/message.js').Message;
 var MessageCollection = require('../models/message.js').MessageCollection;
 var User = require('../models/user.js').User;
 
@@ -118,27 +119,25 @@ class MessageContainer extends React.Component {
     var messageCollection =  new MessageCollection()
 
     messageCollection.fetch().then(()=>{
-      this.setState({messageCollection: messageCollection});
+      this.setState({messageCollection});
     });
 
     this.postMessage = this.postMessage.bind(this);
 
     this.state = {
       messageCollection,
-      username: ''
     };
   }
   postMessage(data){
     var messageData = {
-      username: data.user,
-      message: data.message,
+      username: localStorage.getItem('username'),
+      message: data.message
     };
 
     this.state.messageCollection.create(messageData)
     this.setState({messageCollection: this.state.messageCollection});
   }
   render() {
-
     return(
       React.createElement("div", {className: "container"}, 
         React.createElement("div", {className: "row"}, 
@@ -159,33 +158,13 @@ class MessageContainer extends React.Component {
   }
 }
 
-class MessageList extends React.Component {
-  render(){
-    var messages = this.props.messageList;
-
-    var messageList = messages.map((data) => {
-      return (
-        React.createElement("li", {key: data.get('objectId')}, 
-          React.createElement("span", null, data.get('username')), 
-          React.createElement("p", null, data.get('message'))
-        )
-      )
-    })
-
-    return (
-      React.createElement("ul", null, 
-        messageList
-      )
-    )
-  }
-}
-
 class MessageForm extends React.Component {
   constructor(props){
     super(props)
+    var message = new Message();
 
-  this.handleSubmit = this.handleSubmit.bind(this)
-  this.handleMessage = this.handleMessage.bind(this)
+    this.handleSubmit = this.handleSubmit.bind(this)
+    this.handleMessage = this.handleMessage.bind(this)
 
     this.state = {
       message: ''
@@ -193,8 +172,6 @@ class MessageForm extends React.Component {
   }
   handleSubmit(event){
     event.preventDefault();
-
-    username: localStorage.getItem('user')
 
     this.props.postMessage(this.state);
     this.setState({message: ''})
@@ -216,6 +193,27 @@ class MessageForm extends React.Component {
     );
   }
 };
+
+class MessageList extends React.Component {
+  render(){
+    var messages = this.props.messageList;
+
+    var messageList = messages.map((data) => {
+      return (
+        React.createElement("li", {key: data.get('objectId')}, 
+          React.createElement("span", null, data.get('username')), 
+          React.createElement("p", null, data.get('message'))
+        )
+      )
+    })
+
+    return (
+      React.createElement("ul", null, 
+        messageList
+      )
+    )
+  }
+}
 
 module.exports = {
   MessageContainer
@@ -248,6 +246,8 @@ var Message = Backbone.Model.extend({
 
 var MessageCollection = Backbone.Collection.extend({
   model: Message,
+  idAttribute: 'objectId',
+  
   url: function(){
     return parse.BASE_API_URL = '/classes/Message'
   },
@@ -368,7 +368,7 @@ var parse = {
         xhr.setRequestHeader("X-Parse-REST-API-Key", "somevalue");
 
         if(config.sessionId){
-          xhr.setRequestHeader("X-Parse-Session-Token", sessionId);
+          xhr.setRequestHeader("X-Parse-Session-Token", config.sessionId);
         }
       }
     });
